@@ -1,0 +1,6 @@
+PORT=3000
+FIREBASE_PROJECT_ID=kreditaz-56f70
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@kreditaz-56f70.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="BURAYA_JSON_FAYLINDAN_private_key_deyerini_yaz"
+SMS_LOGIN=
+SMS_PASSWORD=
