@@ -7,31 +7,37 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test endpoint
 app.get('/', (req, res) => {
   res.json({ status: 'KreditAz Backend işləyir ✅' });
 });
 
-// SMS göndər
+// SMS göndər - Infobip
 app.post('/send-sms', async (req, res) => {
   const { phone, code } = req.body;
   try {
-    await axios.post('https://smsc.kz/sys/send.php', null, {
-      params: {
-        login: process.env.SMS_LOGIN,
-        psw: process.env.SMS_PASSWORD,
-        phones: '+994' + phone,
-        mes: `KreditAz: Təsdiq kodunuz: ${code}`,
-        fmt: 3
+    await axios.post(
+      `https://${process.env.INFOBIP_BASE_URL}/sms/2/text/advanced`,
+      {
+        messages: [{
+          from: 'KreditAz',
+          destinations: [{ to: '994' + phone }],
+          text: `KreditAz: Təsdiq kodunuz: ${code}`
+        }]
+      },
+      {
+        headers: {
+          'Authorization': `App ${process.env.INFOBIP_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
     res.json({ success: true });
-  } catch (e) {
+  } catch(e) {
     res.json({ success: false, error: e.message });
   }
 });
 
-// Qeydiyyat saxla
+// Qeydiyyat
 app.post('/register', async (req, res) => {
   const data = req.body;
   try {
@@ -41,13 +47,13 @@ app.post('/register', async (req, res) => {
       createdAt: new Date().toISOString(),
       status: 'pending'
     });
-    res.json({ success: true, message: 'Qeydiyyat tamamlandı' });
-  } catch (e) {
+    res.json({ success: true });
+  } catch(e) {
     res.json({ success: false, error: e.message });
   }
 });
 
-// Giriş yoxla
+// Giriş
 app.post('/login', async (req, res) => {
   const { fin, password } = req.body;
   try {
@@ -58,7 +64,7 @@ app.post('/login', async (req, res) => {
     const user = snap.docs[0].data();
     if (user.password !== password) return res.json({ success: false, message: 'Şifrə yanlışdır' });
     res.json({ success: true, user: { name: user.fname, fin: user.fin } });
-  } catch (e) {
+  } catch(e) {
     res.json({ success: false, error: e.message });
   }
 });
